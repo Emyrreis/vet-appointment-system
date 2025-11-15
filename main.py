@@ -92,6 +92,94 @@ class Pet:
     
     def __str__(self) -> str:
         return f"{self.__name} ({self.__species}, {self.__age} anos) - Dono: {self.__owner.name}"
+    
+#classe abstrata de consultas
+class Appointment:
+    def __init__(self, pet: Pet, veterinarian: Veterinarian, date: str):
+        self._pet = pet
+        self._veterinarian = veterinarian
+        self._date = date
+        self._status = "Agendada"
+    
+    @property
+    def pet(self) -> Pet:
+        return self._pet
+    
+    @property
+    def veterinarian(self) -> Veterinarian:
+        return self._veterinarian
+    
+    @property
+    def date(self) -> str:
+        return self._date
+    
+    @property
+    def status(self) -> str:
+        return self._status
+    
+    @status.setter
+    def status(self, new_status: str):
+        self._status = new_status
+    
+    def get_price(self) -> float:
+        return 0.0
+    
+    def get_type(self) -> str:
+        return "Consulta"
+    
+    def __str__(self) -> str:
+        return (f"{self.get_type()} - Pet: {self._pet.name} | "
+                f"Veterinário: {self._veterinarian.name} | "
+                f"Data: {self._date} | Status: {self._status} | "
+                f"Valor: R$ {self.get_price():.2f}")
+
+#consulta de rotina
+class RoutineAppointment(Appointment):
+    def __init__(self, pet: Pet, veterinarian: Veterinarian, date: str):
+        super().__init__(pet, veterinarian, date)
+    
+    def get_price(self) -> float:
+        return 150.00
+    
+    def get_type(self) -> str:
+        return "Consulta de Rotina"
+
+#consulta de emergência
+class EmergencyAppointment(Appointment):
+    def __init__(self, pet: Pet, veterinarian: Veterinarian, date: str):
+        super().__init__(pet, veterinarian, date)
+    
+    def get_price(self) -> float:
+        return 300.00
+    
+    def get_type(self) -> str:
+        return "Consulta de Emergência"
+
+#consulta de vacinação
+class VaccinationAppointment(Appointment):
+    def __init__(self, pet: Pet, veterinarian: Veterinarian, date: str):
+        super().__init__(pet, veterinarian, date)
+    
+    def get_price(self) -> float:
+        return 80.00
+    
+    def get_type(self) -> str:
+        return "Vacinação"
+
+#factory - fábrica de consultas
+class AppointmentFactory:
+    @staticmethod
+    def create_appointment(appointment_type: str, pet: Pet, 
+                          veterinarian: Veterinarian, date: str) -> Appointment:
+        if appointment_type == "routine":
+            return RoutineAppointment(pet, veterinarian, date)
+        elif appointment_type == "emergency":
+            return EmergencyAppointment(pet, veterinarian, date)
+        elif appointment_type == "vaccination":
+            return VaccinationAppointment(pet, veterinarian, date)
+        else:
+            #retorna consulta de rotina como padrão
+            return RoutineAppointment(pet, veterinarian, date)
 
 #função principal
 def main():    
@@ -126,6 +214,14 @@ def main():
         age = 3,
         owner = client2
     )
+
+    vet1 = Veterinarian(
+        name = "Dr. Lino Moraes",
+        email = "lino@vetclinica.com",
+        id = "CRMV-12345",
+        phone = "(63)98888-7777",
+        specialty = "Clínica Geral"
+    )
     
     #testando
     print(client1)
@@ -134,6 +230,40 @@ def main():
     print(client2)
     print(f"Pet: {pet2}\n")
 
+    print("\nVeterinário:")
+    print(vet1)
+    print()
+    
+    #testando o factory
+    print("Agendamentos")
+    
+    #criando diferentes tipos de consultas usando a factory
+    appointment1 = AppointmentFactory.create_appointment(
+        appointment_type = "routine",
+        pet = pet1,
+        veterinarian = vet1,
+        date = "20/11/2025"
+    )
+    
+    appointment2 = AppointmentFactory.create_appointment(
+        appointment_type = "emergency",
+        pet = pet2,
+        veterinarian = vet1,
+        date = "18/11/2025"
+    )
+    
+    appointment3 = AppointmentFactory.create_appointment(
+        appointment_type = "vaccination",
+        pet = pet1,
+        veterinarian = vet1,
+        date = "22/11/2025"
+    )
+    
+    #exibindo as consultas criadas
+    print(appointment1)
+    print(appointment2)
+    print(appointment3)
+    print()
 
 if __name__ == "__main__":
     main()

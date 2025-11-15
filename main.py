@@ -1,41 +1,67 @@
-#classe do cliente
-class Client:
+#super classe de pessoas
+class Person:    
     def __init__(self, name: str, email: str, id: str, phone: str):
-        self.__name = name
-        self.__email = email
-        self.__id = id
-        self.__phone = phone
+        self._name = name
+        self._email = email
+        self._id = id
+        self._phone = phone
     
-    #getters - acesso aos atributos privados
+    #getters
     @property
     def name(self) -> str:
-        return self.__name
+        return self._name
     
     @property
     def email(self) -> str:
-        return self.__email
+        return self._email
     
     @property
     def id(self) -> str:
-        return self.__id
+        return self._id
     
     @property
     def phone(self) -> str:
-        return self.__phone
+        return self._phone
     
-    #setters - modificar os atributos privados
+    #setters
     @email.setter
     def email(self, new_email: str):
-        self.__email = new_email
+        self._email = new_email
     
     @phone.setter
     def phone(self, new_phone: str):
-        self.__phone = new_phone
+        self._phone = new_phone
     
     def __str__(self) -> str:
-        return f"Cliente: {self.__name} | Email: {self.__email} | Telefone: {self.__phone}"
+        return f"{self._name} | Email: {self._email} | Telefone: {self._phone}"
 
-#classe do pet
+#classe dos donos dos pets  
+class Client(Person):    
+    def __init__(self, name: str, email: str, id: str, phone: str):
+        #chama o construtor da classe pai
+        super().__init__(name, email, id, phone)
+    
+    def __str__(self) -> str:
+        return f"Cliente: {super().__str__()}"
+
+#classe dos veterinários
+class Veterinarian(Person):
+    def __init__(self, name: str, email: str, id: str, phone: str, specialty: str):
+        super().__init__(name, email, id, phone)
+        self._specialty = specialty
+    
+    @property
+    def specialty(self) -> str:
+        return self._specialty
+    
+    @specialty.setter
+    def specialty(self, new_specialty: str):
+        self._specialty = new_specialty
+    
+    def __str__(self) -> str:
+        return f"Veterinário: {super().__str__()} | Especialidade: {self._specialty}"
+
+#classe pets
 class Pet:
     def __init__(self, name: str, species: str, age: int, owner: Client):
         self.__name = name
@@ -68,21 +94,21 @@ class Pet:
         return f"{self.__name} ({self.__species}, {self.__age} anos) - Dono: {self.__owner.name}"
 
 #função principal
-def main():
-    print("Sistema de Agendamento Veterinário: \n")
+def main():    
+    print("Sistema de Agendamento Veterinário\n")
     
-    #criando clientes
+    #ciando clientes
     client1 = Client(
-        name = "Thiago",
-        email = "tatato@email.com",
+        name = "Isabella",
+        email = "isa@gmail.com",
         id = "123456",
-        phone = "(63)98765-4321"
+        phone = "(63)91234-1234"
     )
     
     client2 = Client(
-        name = "Isabella",
-        email = "isa@email.com",
-        id = "654321",
+        name = "Thiago",
+        email = "tato@gmail.com",
+        id = "789101",
         phone = "(63)99999-8888"
     )
     
@@ -101,7 +127,7 @@ def main():
         owner = client2
     )
     
-    #testando os dados
+    #testando
     print(client1)
     print(f"Pet: {pet1}\n")
     

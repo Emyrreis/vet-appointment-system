@@ -1,3 +1,5 @@
+from typing import Protocol
+
 #super classe de pessoas
 class Person:    
     def __init__(self, name: str, email: str, id: str, phone: str):
@@ -181,6 +183,39 @@ class AppointmentFactory:
             #retorna consulta de rotina como padrão
             return RoutineAppointment(pet, veterinarian, date)
 
+#protocolo de notificação (interface)
+class NotificationProtocol(Protocol):
+    def appointment_updated(self, appointment: Appointment, action: str) -> None:
+        ...
+
+#gerenciador de consultas 
+class AppointmentManager:
+    def __init__(self):
+        self._observers: list[NotificationProtocol] = []
+        self._appointments: list[Appointment] = []
+    
+    def add_observer(self, observer: NotificationProtocol):
+        self._observers.append(observer)
+    
+    def remove_observer(self, observer: NotificationProtocol):
+        self._observers.remove(observer)
+    
+    def notify_all(self, appointment: Appointment, action: str):
+        for observer in self._observers:
+            observer.appointment_updated(appointment, action)
+    
+    def schedule_appointment(self, appointment: Appointment):
+        self._appointments.append(appointment)
+        self.notify_all(appointment, "agendada")
+    
+    def cancel_appointment(self, appointment: Appointment):
+        appointment.status = "Cancelada"
+        self.notify_all(appointment, "cancelada")
+    
+    def confirm_appointment(self, appointment: Appointment):
+        appointment.status = "Confirmada"
+        self.notify_all(appointment, "confirmada")
+
 #função principal
 def main():    
     print("Sistema de Agendamento Veterinário\n")
@@ -234,8 +269,11 @@ def main():
     print(vet1)
     print()
     
-    #testando o factory
-    print("Agendamentos")
+#testando o factory e observer pattern
+    print("Agendamentos\n")
+    
+    #criando o gerenciador de consultas
+    manager = AppointmentManager()
     
     #criando diferentes tipos de consultas usando a factory
     appointment1 = AppointmentFactory.create_appointment(
@@ -259,8 +297,14 @@ def main():
         date = "22/11/2025"
     )
     
+    #agendando consultas
+    print("Agendando consultas...")
+    manager.schedule_appointment(appointment1)
+    manager.schedule_appointment(appointment2)
+    manager.schedule_appointment(appointment3)
+    
     #exibindo as consultas criadas
-    print(appointment1)
+    print(f"\n{appointment1}")
     print(appointment2)
     print(appointment3)
     print()

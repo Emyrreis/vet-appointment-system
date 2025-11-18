@@ -216,6 +216,27 @@ class AppointmentManager:
         appointment.status = "Confirmada"
         self.notify_all(appointment, "confirmada")
 
+#notificação por email
+class EmailNotification:
+    def appointment_updated(self, appointment: Appointment, action: str):
+        print(f"Email enviado para {appointment.pet.owner.email}")
+        print(f"   Assunto: Consulta {action}")
+        print(f"   Mensagem: Olá {appointment.pet.owner.name}!")
+        print(f"   Sua consulta para {appointment.pet.name} foi {action}.")
+        print(f"   Tipo: {appointment.get_type()}")
+        print(f"   Data: {appointment.date}")
+        print(f"   Veterinário: {appointment.veterinarian.name}")
+        print(f"   Valor: R$ {appointment.get_price():.2f}\n")
+
+#notificação por SMS
+class SMSNotification:
+    def appointment_updated(self, appointment: Appointment, action: str):
+        print(f"SMS enviado para {appointment.pet.owner.phone}")
+        print(f"   {appointment.pet.owner.name}, sua consulta para {appointment.pet.name}")
+        print(f"   foi {action} em {appointment.date}.")
+        print(f"   Veterinário: Dr. {appointment.veterinarian.name.split()[-1]}")
+        print(f"   Valor: R$ {appointment.get_price():.2f}\n")
+    
 #função principal
 def main():    
     print("Sistema de Agendamento Veterinário\n")
@@ -270,10 +291,18 @@ def main():
     print()
     
 #testando o factory e observer pattern
-    print("Agendamentos\n")
+    print("Agendamento com Notificações\n")
     
     #criando o gerenciador de consultas
     manager = AppointmentManager()
+    
+    #criando os observadores (notificações)
+    email_notification = EmailNotification()
+    sms_notification = SMSNotification()
+    
+    #registrando os observadores no gerenciador
+    manager.add_observer(email_notification)
+    manager.add_observer(sms_notification)
     
     #criando diferentes tipos de consultas usando a factory
     appointment1 = AppointmentFactory.create_appointment(
@@ -308,6 +337,15 @@ def main():
     print(appointment2)
     print(appointment3)
     print()
+
+#testando cancelamento e confirmação
+    print("\nTestando\n")
+    
+    print("Confirmando consulta de rotina...")
+    manager.confirm_appointment(appointment1)
+    
+    print("\nCancelando consulta de emergência...")
+    manager.cancel_appointment(appointment2)
 
 if __name__ == "__main__":
     main()
